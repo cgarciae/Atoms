@@ -1,29 +1,33 @@
-﻿using System;
+using System;
 using System.Collections;
 
 namespace Atoms {
-	public class Atomize<A> : Chain<A> {
+	public class Atomize<B> : Chain<B>, IChain<B> {
 
-		IChain<A> chain;
+		IEnumerable enu;
 
-		public Atomize (IChain<A> chain, Quantum prev) : base (prev, null)
-		{
-			this.chain = chain;
+		internal Atomize (IEnumerable enu, Quantum prev, Quantum next) : base (prev, next) {
+			this.enu = enu;
 		}
 
-		public Atomize (IChain<A> chain, Quantum prev, Quantum next) : base (prev, next)
+		public Atomize (IChain<B> chain, Quantum prev) : base (prev, null)
 		{
-			this.chain = chain;
+			this.enu = chain;
+		}
+
+		public Atomize (IChain<B> chain, Quantum prev, Quantum next) : base (prev, next)
+		{
+			this.enu = chain;
 		}
 
 		internal override IEnumerable GetEnumerable ()
 		{
-			return chain;
+			return enu;
 		}
 
-		public override Chain<A> copyChain {
+		public override Chain<B> copyChain {
 			get {
-				return new Atomize<A> (chain, prev, next);
+				return new Atomize<B> (enu, prev, next);
 			}
 		}
 

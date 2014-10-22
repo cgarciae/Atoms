@@ -1,8 +1,8 @@
-﻿using System;
+using System;
 using System.Collections;
 
 namespace Atoms {
-	public class Map<A,B> : Quantum, IChain<B> {
+	public class Map<A,B> : Bond<A,B> {
 		
 		public Func<A,B> f;
 		
@@ -26,7 +26,7 @@ namespace Atoms {
 		}
 		
 		public Map<B,B> MakeMap (Action<B> f) {
-			return Map<B,B>._ (f);
+			return Map<B,B>._ (f.ToFunc());
 		}
 
 		public Bind<B,C> MakeBind<C> (Func<B,Chain<C>> f) {
@@ -41,12 +41,17 @@ namespace Atoms {
 				yield return enu.Current;
 
 
+			var a = (A)enu.Current;
 			B b = default (B);
 
-			if (b != null) { 
+			if (a != null) {
 				try
 				{
-					b = f ((A)enu.Current);
+					b = f (a);
+
+					if (b == null)
+						throw new Exception ("Function returned null reference");
+
 				} 
 				catch (Exception e) 
 				{
@@ -56,16 +61,8 @@ namespace Atoms {
 
 			yield return b;
 		}
-
-		public Chain<B> MakeChain ()
-		{
-			var copy = copyQuantum;
-			var chain = new Atomize<B> (copy as IChain<B>, copy);
-
-			return chain;
-		}
 		
-		public override Quantum copyQuantum {
+		public override Bond<A,B> copyBond {
 			get {
 				var copy = new Map<A,B> (f);
 				copy.prev = prev;
@@ -78,15 +75,11 @@ namespace Atoms {
 		public static Map<A,B> _ (Func<A,B> f) {
 			return new Map<A, B> (f);
 		}
-		
-		public static Map<A,A> _ (Action<A> f) {
-			return new Map<A, A> (f.ToFunc());
-		}
 
-		public static Chain<B> operator % (Chain<A> c, Map<A,B> m)
-		{
-			return c.copyChain.FMap (m.f);
-		}
+//		public static Chain<B> operator * (Chain<A> c, Map<A,B> m)
+//		{
+//			return c.copyChain.FMap (m.f);
+//		}
 		
 	}
 }

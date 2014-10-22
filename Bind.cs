@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System;
 using System.Collections;
 
@@ -112,7 +112,7 @@ namespace Atoms {
 
 	}
 
-	public class Bind<A,B> : Quantum, IChain<B> {
+	public class Bind<A,B> : Bond<A,B> {
 		
 		public Func<A, Chain<B>> f;
 		
@@ -129,14 +129,6 @@ namespace Atoms {
 		public Bind (Func<A, Chain<B>> f, Chain<A> c, Quantum next) : base (c, next)
 		{
 			this.f = f;
-		}
-
-		public Chain<B> MakeChain ()
-		{
-			var copy = copyQuantum;
-			var chain = new Atomize<B> (copy as IChain<B>, copy);
-			
-			return chain;
 		}
 
 		internal override IEnumerable GetEnumerable ()
@@ -169,7 +161,7 @@ namespace Atoms {
 
 		}
 
-		public override Quantum copyQuantum {
+		public override Bond<A,B> copyBond {
 			get {
 				var copy = new Bind<A,B> (f);
 				copy.prev = prev;
@@ -184,16 +176,16 @@ namespace Atoms {
 		}
 		
 		public Map<B,B> MakeMap (Action<B> f) {
-			return Map<B,B>._ (f);
+			return Map<B,B>._ (f.ToFunc());
 		}
 		
 		public Bind<B,C> MakeBind<C> (Func<B,Chain<C>> f) {
 			return Atoms.Bind._ (f);
 		}
 
-		public static Chain<B> operator % (Chain<A> c, Bind<A,B> b)
-		{
-			return c.copyChain.Bind (b.f);
-		}
+//		public static Chain<B> operator * (Chain<A> c, Bind<A,B> b)
+//		{
+//			return c.copyChain.Bind (b.f);
+//		}
 	}
 }

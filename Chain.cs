@@ -2,7 +2,7 @@
 using System.Collections;
 
 namespace Atoms {
-	public abstract class Chain<A> : Atom, Monad<A>, IChain<A> {
+	public abstract class Chain<A> : Atom, Monad<A> {
 
 		public Chain () {}
 		public Chain (Quantum prev, Quantum next) : base (prev, next) {}
@@ -14,7 +14,7 @@ namespace Atoms {
 
 		public Map<A,A> MakeMap (Action<A> f)
 		{
-			return Map<A,A>._ (f);
+			return Map<A,A>._ (f.ToFunc());
 		}
 
 		public Bind<A,B> MakeBind<B> (Func<A,Chain<B>> f) {
@@ -86,10 +86,9 @@ namespace Atoms {
 			
 			return (copyA) .SetNext (copyB) as Chain<A>;
 		}
-	}
 
-	public interface IChain<A> : IEnumerable
-	{
+	}
+	public interface IChain<A> : IEnumerable {
 		Chain<A> MakeChain ();
 	}
 }

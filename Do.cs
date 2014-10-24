@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Atoms {
 	public class Do : Atom {
@@ -15,12 +16,6 @@ namespace Atoms {
 		public override IEnumerable<Quantum> GetQuanta ()
 		{
 			yield return this;
-		}
-
-		public override Quantum copy {
-			get {
-				return new Do (f);
-			}
 		}
 
 		internal override IEnumerable GetEnumerable ()
@@ -38,10 +33,48 @@ namespace Atoms {
 			return new Do (f);
 		}
 
-//		public static Do<A> _<A> (Func<A> f) {
-//			return new Do<A> (f);
-//		}
+		public static Do<A> _<A> (Func<A> f) {
+			return new Do<A> (f);
+		}
 
+	}
+
+	public class Do<A> : Sequence<A> 
+	{
+		public Func<A> f;
+
+		public Do (Func<A> f)
+		{
+			this.f = f;
+		}
+
+		internal override IEnumerable GetEnumerable ()
+		{
+			return GetEnumerator ().ToEnumerable ();
+		}
+
+		public override IEnumerable<Quantum> GetQuanta ()
+		{
+			yield return this;
+		}
+
+		public override IEnumerator<A> GetEnumerator ()
+		{
+			A a = default (A);
+
+			try {
+
+				a =  f ();
+
+				if (a == null)
+					throw new NullReferenceException ("Function returned null reference");
+
+			} catch (Exception e) {
+				ex = e;
+			}
+			
+			yield return a;
+		}
 	}
 
 //	public class Do<A> : Chain<A> {

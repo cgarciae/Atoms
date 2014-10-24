@@ -1,15 +1,61 @@
-//using System;
-//using System.Collections;
-//
-//namespace Atoms {
-//	public class Map<A,B> : Bond<A,B> {
-//		
-//		public Func<A,B> f;
-//		
-//		public Map (Func<A, B> f)
-//		{
-//			this.f = f;
-//		}
+using System;
+using System.Collections;
+using System.Collections.Generic;
+
+namespace Atoms {
+	public class Map<A,B> : Bond<A,B> {
+		
+		public Func<A,B> f;
+		
+		public Map (Func<A, B> f)
+		{
+			this.f = f;
+		}
+
+		internal override IEnumerable GetEnumerable ()
+		{
+			var enu = prev.GetEnumerator();
+
+			while (enu.MoveNext())
+				yield return enu.Current;
+
+			B b = default (B);
+
+			try 
+			{
+				A a = (A) enu.Current;
+				b = f (a);
+
+				if (b == null)
+					throw new NullReferenceException ("Function returned null reference");
+			}
+			catch (Exception e)
+			{
+				ex = e;		
+			}
+
+			yield return b;
+
+		}
+
+		public override IEnumerable<Quantum> GetQuanta ()
+		{
+			yield return this;
+
+			foreach (var _ in prev.GetQuanta ()) yield return _;
+		}
+
+		public Map<B,C> MakeMap<C> (Func<B,C> f)
+		{
+			return new Map<B, C> (f);	
+		}
+
+		public Map<B,B> MakeMap (Action<B> f)
+		{
+			return MakeMap (f.ToFunc());
+		}
+	}
+}
 //
 //		public Map (Func<A, B> f, Chain<A> c) : base (c, null)
 //		{

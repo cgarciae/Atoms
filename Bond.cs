@@ -1,3 +1,26 @@
+using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
+
+namespace Atoms
+{
+	public abstract class Bond<A,B> : BoundQuantum
+	{
+		public static Chain<B> operator * (Chain<A> chain, Bond<A,B> bond) {
+			return new BoundJoin<A,B> (chain, bond);
+		}
+	}
+
+	public abstract class SeqBond<A,B> : BoundQuantum, IEnumerable<B>
+	{	
+		public static Chain<B> operator * (Sequence<A> seq, SeqBond<A,B> bond) {
+			return new BoundSeqJoin<A,B> (seq, bond);
+		}
+
+		public new abstract IEnumerator<B> GetEnumerator ();
+	}
+}
+
 //using UnityEngine;
 //using System.Collections;
 //

@@ -10,15 +10,13 @@ namespace Atoms {
 		{
 			return new Join (a.copy as Atom, b.copy as Atom);
 		}
+	}
 
+	public abstract class BoundAtom : BoundQuantum
+	{
 		public static Atom operator + (Atom a, BoundAtom b)
 		{
 			return new BoundJoin (a.copy as Atom, b.copy as BoundAtom);
 		}
-	}
-
-	public abstract class BoundAtom : Atom 
-	{
-		public Atom prev;
 	}
 }

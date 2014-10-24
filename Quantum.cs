@@ -5,8 +5,6 @@ using System.Collections.Generic;
 public abstract class Quantum : IEnumerable {
 
 	public Exception ex;
-	
-	internal  Quantum () {}
 
 	internal abstract IEnumerable GetEnumerable ();
 	public abstract Quantum copy {get;}

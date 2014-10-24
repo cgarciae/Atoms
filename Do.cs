@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 
 namespace Atoms {
-	public class Do : SimpleAtom {
+	public class Do : Atom {
 
 		public Action f;
 

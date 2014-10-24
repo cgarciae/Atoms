@@ -1,15 +1,15 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
 namespace Atoms 
 { 
-	public class SimpleJoin : SimpleAtom 
+	public class Join : Atom 
 	{
 		Atom a;
-		SimpleAtom b;
+		Atom b;
 
-		public SimpleJoin (Atom a, SimpleAtom b)
+		public Join (Atom a, Atom b)
 		{
 			this.a = a;
 			this.b = b;
@@ -31,12 +31,12 @@ namespace Atoms
 
 		public override Quantum copy {
 			get {
-				return new SimpleJoin (a, b);
+				return new Join (a, b);
 			}
 		}
 	}
 
-	public class BoundJoin : SimpleAtom 
+	public class BoundJoin : Atom 
 	{
 		Atom a;
 		BoundAtom b;

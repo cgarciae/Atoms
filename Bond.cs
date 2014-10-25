@@ -7,14 +7,14 @@ namespace Atoms
 	public abstract class Bond<A,B> : BoundQuantum
 	{
 		public static Chain<B> operator * (Chain<A> chain, Bond<A,B> bond) {
-			return new BoundJoin<A,B> (chain, bond);
+			return chain.Bind (bond);
 		}
 	}
 
 	public abstract class SeqBond<A,B> : BoundQuantum, IEnumerable<B>
 	{	
 		public static Chain<B> operator * (Sequence<A> seq, SeqBond<A,B> bond) {
-			return new BoundSeqJoin<A,B> (seq, bond);
+			return new SeqJoinSeqBond<A,B> (seq, bond);
 		}
 
 		public new abstract IEnumerator<B> GetEnumerator ();

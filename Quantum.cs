@@ -43,7 +43,7 @@ namespace Atoms {
 	}
 
 	public abstract class BoundQuantum : Quantum {
-		public Atom prev;
+		public virtual Quantum prev { get; set; }
 	}
 }
 

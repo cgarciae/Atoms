@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -29,7 +29,7 @@ namespace Atoms
 		public new abstract IEnumerator<A> GetEnumerator ();
 	}
 
-	public abstract class BoundSequence<A> : BoundChain<A>, Monad<A>, IEnumerable<A>
+	public abstract class BoundedSequence<A> : BoundedChain<A>, Monad<A>, IEnumerable<A>
 	{
 		public new Monad<B> Bind<B> (Func<A, Monad<B>> f)
 		{

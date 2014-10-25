@@ -26,7 +26,9 @@ namespace Atoms {
 		public static Map<A,C> Next<A,B,C> (this Map<A,B> a, Map<B,C> b) 
 		{
 			return new Map<A, C> (Fn.Compose (b.f, a.f));
-		} 
+		}
+
+
 
 	}
 

@@ -1,11 +1,138 @@
-//using UnityEngine;
-//using System;
-//using System.Collections;
-//
-//namespace Atoms {
-//	public class Bind : Atom {
-//
-//		public Func<Atom> f;
+using UnityEngine;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+
+namespace Atoms {
+	public class Bind : Atom 
+	{
+		public Func<Atom> f;
+		Atom atom;
+
+		public Bind (Func<Atom> f)
+		{
+			this.f = f;
+		}
+		
+		internal override IEnumerable GetEnumerable ()
+		{	
+			try 
+			{	
+				atom =  f ().copy as Atom;
+				
+				if (atom == null)
+					throw new NullReferenceException ("Function returned null reference");
+			} 
+			catch (Exception e) 
+			{
+				ex = e;
+			}
+
+			if (atom != null)
+				foreach (var _ in atom) yield return _;
+		}
+
+		public override IEnumerable<Quantum> GetQuanta ()
+		{
+			if (atom != null)
+				yield return atom;
+
+			yield return this;
+		}
+
+		public static Bind _ (Func<Atom> f) 
+		{
+			return new Bind (f);
+		}
+
+		public static Bind<A> _<A> (Func<Chain<A>> f) 
+		{
+			return new Bind<A> (f);
+		}
+
+		public static Bind<A,B> _<A,B> (Func<A,Chain<B>> f) 
+		{
+			return new Bind<A,B> (f);
+		}
+	}
+
+	public class Bind<A> : Chain<A>
+	{	
+		public Func<Chain<A>> f;
+		Chain<A> chain;
+		
+		public Bind (Func<Chain<A>> f)
+		{
+			this.f = f;
+		}
+		
+		internal override IEnumerable GetEnumerable ()
+		{	
+			try 
+			{	
+				chain =  f ().copy as Chain<A>;
+				
+				if (chain == null)
+					throw new NullReferenceException ("Function returned null reference");
+			} 
+			catch (Exception e) 
+			{
+				ex = e;
+			}
+			
+			if (chain != null)
+				foreach (var _ in chain) yield return _;
+		}
+		
+		public override IEnumerable<Quantum> GetQuanta ()
+		{
+			if (chain != null)
+				yield return chain;
+			
+			yield return this;
+		}
+	}
+	public class Bind<A,B> : Bond<A,B>
+	{	
+		public Func<A,Chain<B>> f;
+		Chain<B> chain;
+		
+		public Bind (Func<A,Chain<B>> f)
+		{
+			this.f = f;
+		}
+		
+		internal override IEnumerable GetEnumerable ()
+		{
+			var enu = prev.GetEnumerator ();
+			while (enu.MoveNext()) yield return enu.Current;
+
+			try 
+			{	
+				A a = (A) enu.Current;
+				chain =  f (a).copy as Chain<B>;
+				
+				if (chain == null)
+					throw new NullReferenceException ("Function returned null reference");
+			} 
+			catch (Exception e) 
+			{
+				ex = e;
+			}
+			
+			if (chain != null)
+				foreach (var _ in chain) yield return _;
+		}
+		
+		public override IEnumerable<Quantum> GetQuanta ()
+		{
+			if (chain != null)
+				yield return chain;
+			
+			yield return this;
+		}
+	}
+}
 //
 //		public Bind (Func<Atom> f)
 //		{

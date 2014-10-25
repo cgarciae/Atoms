@@ -6,15 +6,24 @@ namespace Atoms
 {
 	public abstract class Chain<A> : Atom, Monad<A>
 	{
-
-		public Monad<B> Bind<B> (Func<A, Monad<B>> f)
+		public Chain<B> Bind<B> (Func<A,Chain<B>> f)
 		{
-			throw new NotImplementedException ();
+			return new ChainJoinBond<A,B> (this.copy as Chain<A>, new Bind<A,B> (f));
 		}
 
-		public Functor<A> Pure (A value)
+		public Chain<B> Bind<B> (Bond<A,B> bond)
 		{
-			throw new NotImplementedException ();
+			return new ChainJoinBond<A,B> (this.copy as Chain<A>, bond);
+		}
+
+		Monad<B> Monad<A>.Bind<B> (Func<A, Monad<B>> f)
+		{
+			return Bind (f as Func<A,Chain<B>>);
+		}
+
+		Functor<A> Applicative<A>.Pure (A value)
+		{
+			return Do._ (() => value);
 		}
 
 		public Functor<B> FMap<B> (Func<A, B> f)
@@ -39,11 +48,11 @@ namespace Atoms
 
 		public static Chain<A> operator + (Atom a, Chain<A> b)
 		{
-			return new Join<A> (a.copy as Atom, b.copy as Chain<A>);
+			return a.Then (b);
 		}
 	}
 
-	public abstract class BoundChain<A> : BoundAtom, Monad<A>
+	public abstract class BoundedChain<A> : BoundedAtom, Monad<A>
 	{
 		public Monad<B> Bind<B> (Func<A, Monad<B>> f)
 		{
@@ -65,9 +74,9 @@ namespace Atoms
 			throw new NotImplementedException ();
 		}
 
-		public static Chain<A> operator + (Atom a, BoundChain<A> b)
+		public static Chain<A> operator + (Atom a, BoundedChain<A> b)
 		{
-			return new BoundJoin<A> (a.copy as Atom, b.copy as BoundChain<A>);
+			return new AtomJoinBoundChain<A> (a.copy as Atom, b.copy as BoundedChain<A>);
 		}
 	}
 }

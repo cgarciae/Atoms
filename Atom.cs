@@ -20,6 +20,16 @@ namespace Atoms {
 			return new AtomJoinAtom (this.copy as Atom, atom.copy as Atom);
 		}
 
+		public Atom Par (Atom other) 
+		{
+			return AtomParallelAtom._ (this, other);	
+		}
+
+		public Chain<A> Par<A> (Chain<A> other) 
+		{
+			return AtomParallelChain<A>._ (this, other);	
+		}
+
 		public static Atom operator + (Atom a, Atom b)
 		{
 			return a.Then (b);
@@ -27,6 +37,21 @@ namespace Atoms {
 		public static Atom operator + (Atom a, BoundedAtom b)
 		{
 			return a.BoundBy (b);
+		}
+
+		public static Atom operator * (int n, Atom atom) 
+		{
+			return atom.Replicate (n).FoldL1 ((sum, next) => sum + next);
+		}
+
+		public static Atom operator * (Atom atom, int n) 
+		{
+			return n * atom;
+		}
+
+		public static Atom operator | (Atom a, Atom b)
+		{
+			return a.Par (b);
 		}
 	}
 

@@ -11,13 +11,13 @@ namespace Atoms
 		}
 	}
 
-	public abstract class SeqBond<A,B> : BoundQuantum, IEnumerable<B>
+	public abstract class SeqBond<A,B> : BoundQuantum, IEnumerable<Maybe<B>>
 	{	
 		public static Chain<B> operator * (Sequence<A> seq, SeqBond<A,B> bond) {
 			return new SeqJoinSeqBond<A,B> (seq, bond);
 		}
 
-		public new abstract IEnumerator<B> GetEnumerator ();
+		public new abstract IEnumerator<Maybe<B>> GetEnumerator ();
 	}
 }
 

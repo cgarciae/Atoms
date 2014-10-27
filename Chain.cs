@@ -13,7 +13,22 @@ namespace Atoms
 
 		public Chain<B> Bind<B> (Bond<A,B> bond)
 		{
-			return new ChainJoinBond<A,B> (this.copy as Chain<A>, bond);
+			return new ChainJoinBond<A,B> (this.copy as Chain<A>, bond.copy as Bond<A,B>);
+		}
+
+		public Chain<B> Bind<B> (Bind<A,B> bind)
+		{
+			return this.Bind ((Bond<A,B>)bind);	
+		}
+
+		public Chain<B> Bind<B> (Map<A,B> map)
+		{
+			return this.Bind ((Bond<A,B>)map);	
+		}
+
+		public Chain<B> FMap<B> (Func<A, B> f)
+		{
+			return new ChainJoinBond<A,B> (this, Map<A,B>._ (f));
 		}
 
 		Monad<B> Monad<A>.Bind<B> (Func<A, Monad<B>> f)
@@ -26,12 +41,12 @@ namespace Atoms
 			return Do._ (() => value);
 		}
 
-		public Functor<B> FMap<B> (Func<A, B> f)
+		Functor<B> Functor<A>.FMap<B> (Func<A, B> f)
 		{
-			throw new NotImplementedException ();
+			return FMap (f);
 		}
 
-		public Functor<A> XMap (Func<Exception, Exception> f)
+		Functor<A> Functor<A>.XMap (Func<Exception, Exception> f)
 		{
 			throw new NotImplementedException ();
 		}
@@ -44,6 +59,16 @@ namespace Atoms
 		public Map<A,A> MakeMap (Action<A> f)
 		{
 			return MakeMap (f.ToFunc());
+		}
+
+		public AtomParallelChain<A> Par (Atom other) 
+		{
+			return AtomParallelChain<A>._ (other, this);
+		}
+
+		public ChainParallelChain<A,B> Par<B> (Chain<B> other) 
+		{
+			return ChainParallelChain<A,B>._ (this, other);
 		}
 
 		public static Chain<A> operator + (Atom a, Chain<A> b)

@@ -92,6 +92,7 @@ namespace Atoms {
 			yield return this;
 		}
 	}
+
 	public class Bind<A,B> : Bond<A,B>
 	{	
 		public Func<A,Chain<B>> f;
@@ -107,13 +108,17 @@ namespace Atoms {
 			var enu = prev.GetEnumerator ();
 			while (enu.MoveNext()) yield return enu.Current;
 
+
 			try 
 			{	
-				A a = (A) enu.Current;
-				chain =  f (a).copy as Chain<B>;
-				
-				if (chain == null)
-					throw new NullReferenceException ("Function returned null reference");
+				var maybeA = (Maybe<A>) enu.Current;
+
+				if (! maybeA.IsNothing) {
+					chain =  f (maybeA.value);
+					
+					if (chain == null)
+						throw new NullReferenceException ("Function returned null reference");
+				}
 			} 
 			catch (Exception e) 
 			{
@@ -128,6 +133,52 @@ namespace Atoms {
 		{
 			if (chain != null)
 				yield return chain;
+			
+			yield return this;
+		}
+	}
+
+	public class SeqBind<A,B> : SeqBond<A,B>
+	{	
+		public Func<A,Sequence<B>> f;
+		Sequence<B> seq;
+		
+		public SeqBind (Func<A,Sequence<B>> f)
+		{
+			this.f = f;
+		}
+
+		public override IEnumerator<Maybe<B>> GetEnumerator ()
+		{
+			throw new NotImplementedException ();
+		}
+		
+		internal override IEnumerable GetEnumerable ()
+		{
+			var enu = prev.GetEnumerator ();
+			while (enu.MoveNext()) yield return enu.Current;
+			
+			try 
+			{	
+				A a = (A) enu.Current;
+				seq =  f (a).copy as Chain<B>;
+				
+				if (seq == null)
+					throw new NullReferenceException ("Function returned null reference");
+			} 
+			catch (Exception e) 
+			{
+				ex = e;
+			}
+			
+			if (seq != null)
+				foreach (var _ in seq) yield return _;
+		}
+		
+		public override IEnumerable<Quantum> GetQuanta ()
+		{
+			if (seq != null)
+				yield return seq;
 			
 			yield return this;
 		}

@@ -58,22 +58,23 @@ namespace Atoms {
 			yield return this;
 		}
 
-		public override IEnumerator<A> GetEnumerator ()
+		public override IEnumerator<Maybe<A>> GetEnumerator ()
 		{
-			A a = default (A);
+			var maybe = Fn.Nothing<A> ();
 
 			try {
 
-				a =  f ();
+				maybe =  Fn.Maybe (f ());
 
-				if (a == null)
+				if (maybe.IsNothing)
 					throw new NullReferenceException ("Function returned null reference");
 
-			} catch (Exception e) {
+			} catch (Exception e)
+			{
 				ex = e;
 			}
 			
-			yield return a;
+			yield return maybe;
 		}
 	}
 

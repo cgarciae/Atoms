@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Atoms 
 {
-	public abstract class Sequence<A> : Chain<A>, Monad<A>, IEnumerable<A>
+	public abstract class Sequence<A> : Chain<A>, Monad<A>, IEnumerable<Maybe<A>>
 	{
 		public new Monad<B> Bind<B> (Func<A, Monad<B>> f)
 		{
@@ -26,10 +26,10 @@ namespace Atoms
 			throw new NotImplementedException ();
 		}
 
-		public new abstract IEnumerator<A> GetEnumerator ();
+		public new abstract IEnumerator<Maybe<A>> GetEnumerator ();
 	}
 
-	public abstract class BoundedSequence<A> : BoundedChain<A>, Monad<A>, IEnumerable<A>
+	public abstract class BoundedSequence<A> : BoundedChain<A>, Monad<A>, IEnumerable<Maybe<A>>
 	{
 		public new Monad<B> Bind<B> (Func<A, Monad<B>> f)
 		{
@@ -51,6 +51,6 @@ namespace Atoms
 			throw new NotImplementedException ();
 		}
 
-		public new abstract IEnumerator<A> GetEnumerator ();
+		public new abstract IEnumerator<Maybe<A>> GetEnumerator ();
 	}
 }

@@ -49,33 +49,6 @@ namespace Atoms
 		}
 	}
 
-	public class SeqJoinSeq<A> : Sequence<A>
-	{
-		public Sequence<A> a;
-		public Sequence<A> b;
-		
-		public SeqJoinSeq (Sequence<A> a, Sequence<A> b)
-		{
-			this.a = a;
-			this.b = b;
-		}
-		
-		internal override IEnumerable GetEnumerable ()
-		{
-			return a.Join (b);
-		}
-
-		public override IEnumerator<Maybe<A>> GetEnumerator ()
-		{
-			return a.Join (b).GetEnumerator();
-		}
-		
-		public override IEnumerable<Quantum> GetQuanta ()
-		{
-			return b.GetQuanta ().Join (a.GetQuanta ());
-		}
-	}
-
 	public class AtomJoinBoundAtom : Atom 
 	{
 		public Atom a;
@@ -157,35 +130,6 @@ namespace Atoms
 		}
 	}
 
-	public class SeqJoinBoundedSeq<A> : Sequence<A> 
-	{
-		public Sequence<A>  a;
-		public BoundedSequence<A> b;
-		
-		public SeqJoinBoundedSeq (Sequence<A> a, BoundedSequence<A> b)
-		{
-			b.prev = a;
-			
-			this.a = a;
-			this.b = b;
-		}
-		
-		internal override IEnumerable GetEnumerable ()
-		{
-			return b;
-		}
-
-		public override IEnumerator<Maybe<A>> GetEnumerator ()
-		{
-			return b.GetEnumerator ();
-		}
-		
-		public override IEnumerable<Quantum> GetQuanta ()
-		{
-			return b.GetQuanta ();
-		}
-	}
-
 	public class ChainJoinBond<A,B> : Chain<B> {
 		
 		public Chain<A> a;
@@ -202,35 +146,6 @@ namespace Atoms
 		internal override IEnumerable GetEnumerable ()
 		{
 			return b;
-		}
-		
-		public override IEnumerable<Quantum> GetQuanta ()
-		{
-			return b.GetQuanta ();
-		}
-	}
-
-	public class SeqJoinSeqBond<A,B> : Sequence<B> {
-		
-		public Sequence<A> a;
-		public SeqBond<A,B> b;
-		
-		public SeqJoinSeqBond (Sequence<A> a, SeqBond<A, B> b)
-		{
-			b.prev = a;
-			
-			this.a = a;
-			this.b = b;
-		}
-		
-		internal override IEnumerable GetEnumerable ()
-		{
-			return b;
-		}
-
-		public override IEnumerator<Maybe<B>> GetEnumerator ()
-		{
-			return b.GetEnumerator ();
 		}
 		
 		public override IEnumerable<Quantum> GetQuanta ()
@@ -333,10 +248,10 @@ namespace Atoms
 				yield return null;
 			}
 			
-			var maybeA = (Maybe<A>)enuA.Current;
-			var maybeB = (Maybe<B>)enuB.Current;
+			var valueA = (A)enuA.Current;
+			var valueB = (B)enuB.Current;
 
-			yield return Fn.Tuple<A,B> () .up (maybeA) .Apply (maybeB);
+			yield return Fn.Tuple (valueA, valueB);
 		}
 		
 		public override IEnumerable<Quantum> GetQuanta ()

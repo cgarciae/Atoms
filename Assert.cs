@@ -4,7 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 
 namespace Atoms {
-	public class Assert : SeqConditional<bool> {
+	public class Assert : ChainConditional<bool> {
 
 		string onFailure;
 		Action onSuccess = Fn.DoNothing;
@@ -22,27 +22,14 @@ namespace Atoms {
 
 		internal override IEnumerable GetEnumerable ()
 		{
-			return GetEnumerator ().ToEnumerable ();
-		}
+			var pred = Cond();
 
-		public override IEnumerator<Maybe<bool>> GetEnumerator ()
-		{
-			var maybe = Fn.Nothing<bool> ();
-			try 
-			{
-				maybe = Fn.Just (Cond());
+			if (pred) 
+				onSuccess();
+			else
+				Debug.Log(onFailure);
 
-				if (maybe.value) 
-					onSuccess();
-				else
-					Debug.Log(onFailure);
-			}
-			catch (Exception e)
-			{
-				ex = e;		
-			}
-
-			yield return maybe;
+			yield return pred;
 		}
 
 		public override IEnumerable<Quantum> GetQuanta ()

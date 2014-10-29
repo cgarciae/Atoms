@@ -20,12 +20,7 @@ namespace Atoms {
 
 		internal override IEnumerable GetEnumerable ()
 		{
-			try {
-				f ();
-			} catch (Exception e) {
-				ex = e;
-			}
-
+			f ();
 			yield return null;
 		}
 
@@ -39,7 +34,7 @@ namespace Atoms {
 
 	}
 
-	public class Do<A> : Sequence<A> 
+	public class Do<A> : Chain<A> 
 	{
 		public Func<A> f;
 
@@ -48,33 +43,14 @@ namespace Atoms {
 			this.f = f;
 		}
 
-		internal override IEnumerable GetEnumerable ()
-		{
-			return GetEnumerator ().ToEnumerable ();
-		}
-
 		public override IEnumerable<Quantum> GetQuanta ()
 		{
 			yield return this;
 		}
 
-		public override IEnumerator<Maybe<A>> GetEnumerator ()
-		{
-			var maybe = Fn.Nothing<A> ();
-
-			try {
-
-				maybe =  Fn.Maybe (f ());
-
-				if (maybe.IsNothing)
-					throw new NullReferenceException ("Function returned null reference");
-
-			} catch (Exception e)
-			{
-				ex = e;
-			}
-			
-			yield return maybe;
+		internal override IEnumerable GetEnumerable ()
+		{	
+			yield return f();
 		}
 	}
 

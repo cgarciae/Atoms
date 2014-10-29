@@ -16,17 +16,11 @@ namespace Atoms {
 		
 		internal override IEnumerable GetEnumerable ()
 		{	
-			try 
-			{	
-				atom =  f ().copy as Atom;
-				
-				if (atom == null)
-					throw new NullReferenceException ("Function returned null reference");
-			} 
-			catch (Exception e) 
-			{
-				ex = e;
-			}
+
+			atom =  f ().copy as Atom;
+			
+			if (atom == null)
+				throw new NullReferenceException ("Function returned null reference");
 
 			if (atom != null)
 				foreach (var _ in atom) yield return _;
@@ -67,21 +61,15 @@ namespace Atoms {
 		}
 		
 		internal override IEnumerable GetEnumerable ()
-		{	
-			try 
-			{	
-				chain =  f ().copy as Chain<A>;
-				
-				if (chain == null)
-					throw new NullReferenceException ("Function returned null reference");
-			} 
-			catch (Exception e) 
-			{
-				ex = e;
-			}
+		{		
+			chain = f ();
 			
-			if (chain != null)
-				foreach (var _ in chain) yield return _;
+			if (chain == null)
+				throw new NullReferenceException ("Function returned null reference");
+
+			chain = (Chain<A>)chain.copy;
+
+			foreach (var _ in chain) yield return _;
 		}
 		
 		public override IEnumerable<Quantum> GetQuanta ()
@@ -109,76 +97,22 @@ namespace Atoms {
 			while (enu.MoveNext()) yield return enu.Current;
 
 
-			try 
-			{	
-				var maybeA = (Maybe<A>) enu.Current;
+			var a = (A) enu.Current;
 
-				if (! maybeA.IsNothing) {
-					chain =  f (maybeA.value);
-					
-					if (chain == null)
-						throw new NullReferenceException ("Function returned null reference");
-				}
-			} 
-			catch (Exception e) 
-			{
-				ex = e;
-			}
-			
-			if (chain != null)
-				foreach (var _ in chain) yield return _;
+			chain = f (a);
+
+			if (chain == null)
+				throw new NullReferenceException ("Function returned null chain");
+
+			chain = (Chain<B>)chain.copy;
+
+			foreach (var _ in chain) yield return _;
 		}
 		
 		public override IEnumerable<Quantum> GetQuanta ()
 		{
 			if (chain != null)
 				yield return chain;
-			
-			yield return this;
-		}
-	}
-
-	public class SeqBind<A,B> : SeqBond<A,B>
-	{	
-		public Func<A,Sequence<B>> f;
-		Sequence<B> seq;
-		
-		public SeqBind (Func<A,Sequence<B>> f)
-		{
-			this.f = f;
-		}
-
-		public override IEnumerator<Maybe<B>> GetEnumerator ()
-		{
-			throw new NotImplementedException ();
-		}
-		
-		internal override IEnumerable GetEnumerable ()
-		{
-			var enu = prev.GetEnumerator ();
-			while (enu.MoveNext()) yield return enu.Current;
-			
-			try 
-			{	
-				A a = (A) enu.Current;
-				seq =  f (a).copy as Chain<B>;
-				
-				if (seq == null)
-					throw new NullReferenceException ("Function returned null reference");
-			} 
-			catch (Exception e) 
-			{
-				ex = e;
-			}
-			
-			if (seq != null)
-				foreach (var _ in seq) yield return _;
-		}
-		
-		public override IEnumerable<Quantum> GetQuanta ()
-		{
-			if (seq != null)
-				yield return seq;
 			
 			yield return this;
 		}

@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 using System;
 using System.Collections;
-//
 //	public class While : Conditional {
 //
 //		public While (Func<bool> Cond) : base (Cond) {}

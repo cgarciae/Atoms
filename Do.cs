@@ -34,7 +34,7 @@ namespace Atoms {
 
 	}
 
-	public class Do<A> : Chain<A> 
+	public class Do<A> : Sequence<A> 
 	{
 		public Func<A> f;
 
@@ -48,7 +48,7 @@ namespace Atoms {
 			yield return this;
 		}
 
-		internal override IEnumerable GetEnumerable ()
+		public override IEnumerator<A> GetEnumerator ()
 		{	
 			yield return f();
 		}

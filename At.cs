@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using Tatacoa;
 
 namespace Atoms {
 	public static partial class At {
@@ -28,11 +30,29 @@ namespace Atoms {
 			return new Map<A, C> (Fn.Compose (b.f, a.f));
 		}
 
-
+		//MapLast
+		public static IEnumerable MapLast<A,B> (this IEnumerable e, Func<A,B> f)
+		{
+			var enu = e.GetEnumerator();
+			
+			while (enu.MoveNext())
+				yield return enu.Current;
+			
+			yield return f ((A) enu.Current);
+		}
 
 	}
 
 	public interface IBound {
 		Atom prev { get; set; }
+	}	
+
+	public abstract partial class Sequence<A> 
+	{
+		public Sequence<A> CycleN (int n)
+		{
+			return this.Replicate (n).FoldL1 ((sum, next) => sum.Then (next));
+		}
 	}
 }
+

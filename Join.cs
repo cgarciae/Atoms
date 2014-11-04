@@ -2,6 +2,7 @@ using UnityEngine;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Tatacoa;
 
 namespace Atoms 
 { 
@@ -154,6 +155,76 @@ namespace Atoms
 		}
 	}
 
+	public class SeqJoinSeq<A> : Sequence<A> 
+	{
+		public Sequence<A> a;
+		public Sequence<A> b;
+		
+		public SeqJoinSeq (Sequence<A> a, Sequence<A> b)
+		{
+			this.a = a;
+			this.b = b;
+		}
+		
+		public override IEnumerator<A> GetEnumerator ()
+		{
+			return a.Join (b).GetEnumerator ();
+		}
+
+		public override IEnumerable<Quantum> GetQuanta ()
+		{
+			return b.GetQuanta ().Join (a.GetQuanta ());
+		}
+	}
+
+	public class SeqJoinBoundSeq<A> : Sequence<A> 
+	{
+		public Sequence<A> a;
+		public BoundedSequence<A> b;
+		
+		public SeqJoinBoundSeq (Sequence<A> a, BoundedSequence<A> b)
+		{
+			b.prev = a;
+
+			this.a = a;
+			this.b = b;
+		}
+		
+		public override IEnumerator<A> GetEnumerator ()
+		{
+			return b.GetEnumerator();
+		}
+		
+		public override IEnumerable<Quantum> GetQuanta ()
+		{
+			return b.GetQuanta ();
+		}
+	}
+
+	public class SeqJoinSeqBond<A,B> : Sequence<B> 
+	{
+		public Sequence<A> a;
+		public SeqBond<A,B> b;
+		
+		public SeqJoinSeqBond (Sequence<A> a, SeqBond<A,B> b)
+		{
+			b.prev = a;
+			
+			this.a = a;
+			this.b = b;
+		}
+
+		public override IEnumerator<B> GetEnumerator ()
+		{
+			return b.GetEnumerator ();
+		}
+		
+		public override IEnumerable<Quantum> GetQuanta ()
+		{
+			return b.GetQuanta ();
+		}
+	}
+
 	//Parallels
 	public class AtomParallelAtom : Atom
 	{
@@ -266,5 +337,7 @@ namespace Atoms
 			return new ChainParallelChain<A,B> (a, b);	
 		}
 	}
+
+
 }
 

@@ -1,10 +1,11 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using Tatacoa;
 
 namespace Atoms 
 {
-	public abstract class Chain<A> : Atom, Monad<A>
+	public abstract partial class Chain<A> : Atom, Monad<A>
 	{
 		public Chain<B> Bind<B> (Func<A,Chain<B>> f)
 		{
@@ -61,6 +62,11 @@ namespace Atoms
 			return MakeMap (f.ToFunc());
 		}
 
+		public Bind<A,B> MakeBind<B> (Func<A,Chain<B>> f)
+		{
+			return new Bind<A, B> (f);	
+		}
+
 		public AtomParallelChain<A> Par (Atom other) 
 		{
 			return AtomParallelChain<A>._ (other, this);
@@ -73,7 +79,17 @@ namespace Atoms
 
 		public static Chain<A> operator + (Atom a, Chain<A> b)
 		{
-			return a.Then (b);
+			return a.Bind (b);
+		}
+
+		public static Chain<A> operator * (int n, Chain<A> chain) 
+		{
+			return chain.Replicate (n).FoldL1 ((sum, next) => sum + next);
+		}
+		
+		public static Chain<A> operator * (Chain<A> chain, int n) 
+		{
+			return n * chain;
 		}
 	}
 

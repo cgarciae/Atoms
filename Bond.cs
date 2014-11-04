@@ -10,6 +10,20 @@ namespace Atoms
 			return chain.Bind (bond);
 		}
 	}
+
+	public abstract class SeqBond<A,B> : BoundQuantum, IEnumerable<B>
+	{
+		public abstract IEnumerator<B> GetEnumerator ();
+
+		internal override IEnumerable GetEnumerable ()
+		{
+			return GetEnumerator ().ToEnumerable ();
+		}
+
+		public static Sequence<B> operator * (Sequence<A> seq, SeqBond<A,B> bond) {
+			return seq.Bind (bond);
+		}
+	}
 }
 
 //using UnityEngine;

@@ -1,23 +1,41 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using Tatacoa;
 
 namespace Atoms {
-	public abstract class Atom : Quantum {
+	public abstract partial class Atom : Quantum {
 
-		public Atom BoundBy (BoundedAtom boundAtom)
-		{
-			return new AtomJoinBoundAtom (this.copy as Atom, boundAtom.copy as BoundedAtom);
-		}
-
-		public Chain<A> Then<A> (Chain<A> chain)
-		{
-			return new AtomJoinChain<A> (this.copy as Atom, chain.copy as Chain<A>);
-		}
+		public static Atom DoNothing = new Do (() => {});
 
 		public Atom Then (Atom atom)
 		{
 			return new AtomJoinAtom (this.copy as Atom, atom.copy as Atom);
+		}
+
+		public Atom BoundedBy (BoundedAtom boundAtom)
+		{
+			return new AtomJoinBoundAtom (this.copy as Atom, boundAtom.copy as BoundedAtom);
+		}
+
+		public Atom Then (Func<Atom> f)
+		{
+			return Then (LazyAtom._ (f));
+		}
+
+		public Chain<A> Bind<A> (Chain<A> chain)
+		{
+			return new AtomJoinChain<A> (this.copy as Atom, chain.copy as Chain<A>);
+		}
+
+		public Chain<A> BoundedBy<A> (BoundedChain<A> chain)
+		{
+			return new AtomJoinBoundChain<A> (this.copy as Atom, chain.copy as BoundedChain<A>);
+		}
+
+		public Chain<A> Bind<A> (Func<Chain<A>> f)
+		{
+			return Bind (Atoms.LazyAtom._ (f));
 		}
 
 		public Atom Par (Atom other) 
@@ -36,7 +54,7 @@ namespace Atoms {
 		}
 		public static Atom operator + (Atom a, BoundedAtom b)
 		{
-			return a.BoundBy (b);
+			return a.BoundedBy (b);
 		}
 
 		public static Atom operator * (int n, Atom atom) 

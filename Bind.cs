@@ -2,84 +2,9 @@ using UnityEngine;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Tatacoa;
 
 namespace Atoms {
-	public class Bind : Atom 
-	{
-		public Func<Atom> f;
-		Atom atom;
-
-		public Bind (Func<Atom> f)
-		{
-			this.f = f;
-		}
-		
-		internal override IEnumerable GetEnumerable ()
-		{	
-
-			atom =  f ().copy as Atom;
-			
-			if (atom == null)
-				throw new NullReferenceException ("Function returned null reference");
-
-			if (atom != null)
-				foreach (var _ in atom) yield return _;
-		}
-
-		public override IEnumerable<Quantum> GetQuanta ()
-		{
-			if (atom != null)
-				yield return atom;
-
-			yield return this;
-		}
-
-		public static Bind _ (Func<Atom> f) 
-		{
-			return new Bind (f);
-		}
-
-		public static Bind<A> _<A> (Func<Chain<A>> f) 
-		{
-			return new Bind<A> (f);
-		}
-
-		public static Bind<A,B> _<A,B> (Func<A,Chain<B>> f) 
-		{
-			return new Bind<A,B> (f);
-		}
-	}
-
-	public class Bind<A> : Chain<A>
-	{	
-		public Func<Chain<A>> f;
-		Chain<A> chain;
-		
-		public Bind (Func<Chain<A>> f)
-		{
-			this.f = f;
-		}
-		
-		internal override IEnumerable GetEnumerable ()
-		{		
-			chain = f ();
-			
-			if (chain == null)
-				throw new NullReferenceException ("Function returned null reference");
-
-			chain = (Chain<A>)chain.copy;
-
-			foreach (var _ in chain) yield return _;
-		}
-		
-		public override IEnumerable<Quantum> GetQuanta ()
-		{
-			if (chain != null)
-				yield return chain;
-			
-			yield return this;
-		}
-	}
 
 	public class Bind<A,B> : Bond<A,B>
 	{	
@@ -112,9 +37,49 @@ namespace Atoms {
 		public override IEnumerable<Quantum> GetQuanta ()
 		{
 			if (chain != null)
-				yield return chain;
-			
-			yield return this;
+				return chain.GetQuanta ().Join (Fn.AppendL (this, prev.GetQuanta ()));
+			else
+				return Fn.AppendL (this, prev.GetQuanta ());
+		}
+	}
+
+	public class SeqBind<A,B> : SeqBond<A,B>
+	{	
+		public Func<A,Sequence<B>> f;
+		Sequence<B> seq;
+		
+		public SeqBind (Func<A,Sequence<B>> f)
+		{
+			this.f = f;
+		}
+		
+		public override IEnumerator<B> GetEnumerator ()
+		{
+			var prevSeq = ((Sequence<A>)prev);
+
+			foreach (var a in prevSeq)
+			{
+				seq = f (a);
+				
+				if (seq == null)
+					throw new NullReferenceException ("Function returned null chain");
+				
+				foreach (var b in (Sequence<B>)seq.copy) 
+					yield return b;
+			}
+		}
+		
+		public override IEnumerable<Quantum> GetQuanta ()
+		{
+			if (seq != null)
+				return seq.GetQuanta ().Join (Fn.AppendL (this, prev.GetQuanta ()));
+			else
+				return Fn.AppendL (this, prev.GetQuanta ());
+		}
+
+		public static SeqBind<A,B> _ (Func<A,Sequence<B>> f)
+		{
+			return new SeqBind<A, B> (f);
 		}
 	}
 }

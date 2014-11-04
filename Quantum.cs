@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Tatacoa;
 
 namespace Atoms {
 	public abstract class Quantum : IEnumerable {
@@ -13,7 +14,10 @@ namespace Atoms {
 				return MemberwiseClone() as Quantum;
 			}
 		}
-		public abstract IEnumerable<Quantum> GetQuanta ();
+		public virtual IEnumerable<Quantum> GetQuanta ()
+		{
+			yield return this;
+		}
 		
 		public IEnumerator GetEnumerator ()
 		{
@@ -23,6 +27,11 @@ namespace Atoms {
 
 	public abstract class BoundQuantum : Quantum {
 		public virtual Quantum prev { get; set; }
+
+		public override IEnumerable<Quantum> GetQuanta ()
+		{
+			return Fn.AppendL (this, prev.copy.GetQuanta());
+		}
 	}
 }
 

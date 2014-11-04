@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Tatacoa;
 
 namespace Atoms {
 	public class Map<A,B> : Bond<A,B> {
@@ -14,20 +15,7 @@ namespace Atoms {
 
 		internal override IEnumerable GetEnumerable ()
 		{
-			var enu = prev.GetEnumerator();
-
-			while (enu.MoveNext())
-				yield return enu.Current;
-
-			yield return f ((A) enu.Current);
-
-		}
-
-		public override IEnumerable<Quantum> GetQuanta ()
-		{
-			yield return this;
-
-			foreach (var _ in prev.GetQuanta ()) yield return _;
+			return prev.copy.MapLast (f);
 		}
 
 		public Map<B,C> MakeMap<C> (Func<B,C> f)
@@ -43,6 +31,46 @@ namespace Atoms {
 		public static Map<A,B> _ (Func<A,B> f)
 		{
 			return new Map<A, B> (f);	
+		}
+	}
+
+	public class SeqMap<A,B> : SeqBond<A,B>, IEnumerable<B>
+	{
+		public Func<A,B> f;
+
+		public SeqMap (Func<A, B> f)
+		{
+			this.f = f;
+		}
+
+		public SeqMap<B,C> MakeMap<C> (Func<B,C> f)
+		{
+			return new SeqMap<B, C> (f);	
+		}
+		
+		public SeqMap<B,B> MakeMap (Action<B> f)
+		{
+			return MakeMap (f.ToFunc());
+		}
+		
+		public SeqBind<B,C> MakeBind<C> (Func<B,Sequence<C>> f)
+		{
+			return new SeqBind<B, C> (f);	
+		}
+
+		internal override IEnumerable GetEnumerable ()
+		{
+			return GetEnumerator ().ToEnumerable ();
+		}
+
+		public override IEnumerator<B> GetEnumerator ()
+		{
+			return ((IEnumerable<A>)prev).FMap (f).GetEnumerator();
+		}
+
+		public static SeqMap<A,B> _ (Func<A,B> f)
+		{
+			return new SeqMap<A, B> (f);
 		}
 	}
 }

@@ -20,17 +20,17 @@ namespace Atoms {
 		{
 			var enu = prev.GetEnumerator ();
 			while (enu.MoveNext()) yield return enu.Current;
-
-
+			
+			
 			var a = (A) enu.Current;
-
+			
 			chain = f (a);
-
+			
 			if (chain == null)
 				throw new NullReferenceException ("Function returned null chain");
-
+			
 			chain = (Chain<B>)chain.copy;
-
+			
 			foreach (var _ in chain) yield return _;
 		}
 		
@@ -40,6 +40,70 @@ namespace Atoms {
 				return chain.GetQuanta ().Join (Fn.AppendL (this, prev.GetQuanta ()));
 			else
 				return Fn.AppendL (this, prev.GetQuanta ());
+		}
+	}
+
+	public class BindEach<A,B> : SeqBondChain<A,B>
+	{	
+		public Func<A,Chain<B>> f;
+		Chain<B> chain;
+		
+		public BindEach (Func<A,Chain<B>> f)
+		{
+			this.f = f;
+		}
+		
+		internal override IEnumerable GetEnumerable ()
+		{
+			var prevSeq = ((Sequence<A>)prev);
+			
+			foreach (var a in prevSeq)
+			{
+				chain = f (a);
+				
+				if (chain == null)
+					throw new NullReferenceException ("Function returned null chain");
+				
+				foreach (var b in (Chain<B>)chain.copy) 
+					yield return b;
+			}
+		}
+
+		public static BindEach<A,B> _ (Func<A,Chain<B>> f)
+		{
+			return new BindEach<A, B> (f);
+		}
+	}
+
+	public class BindEach<A> : SeqBondAtom<A>
+	{	
+		public Func<A,Atom> f;
+		Atom atom;
+		
+		public BindEach (Func<A,Atom> f)
+		{
+			this.f = f;
+		}
+		
+		internal override IEnumerable GetEnumerable ()
+		{
+			var prevSeq = ((Sequence<A>)prev);
+			
+			foreach (var a in prevSeq)
+			{
+				atom = f (a);
+				
+				if (atom == null)
+					throw new NullReferenceException ("Function returned null atom");
+				
+				foreach (var b in (Atom)atom.copy) 
+					yield return b;
+			}
+		}
+		
+		public static BindEach<A> _ (Func<A,Atom> f)
+		{
+			return new BindEach<A> (f);
 		}
 	}
 

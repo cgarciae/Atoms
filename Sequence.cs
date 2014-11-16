@@ -17,6 +17,26 @@ namespace Atoms
 			return new SeqJoinSeqBond<A,B> (this, SeqBind<A,B>._ (f));
 		}
 
+		public Chain<B> BindEach<B> (Func<A,Chain<B>> f)
+		{
+			return new SeqJoinSeqBondChain<A,B> (this, BindEach<A,B>._ (f));
+		}
+
+		public Chain<B> BindEach<B> (SeqBondChain<A,B> bond)
+		{
+			return new SeqJoinSeqBondChain<A,B> (this, bond.copy as SeqBondChain<A,B>);
+		}
+
+		public Atom BindEach (Func<A,Atom> f)
+		{
+			return new SeqJoinSeqBondAtom<A> (this, Atoms.BindEach<A>._ (f));
+		}
+		
+		public Atom BindEach (SeqBondAtom<A> bond)
+		{
+			return new SeqJoinSeqBondAtom<A> (this, bond.copy as SeqBondAtom<A>);
+		}
+
 		public Sequence<B> Bind<B> (SeqBond<A,B> bond)
 		{
 			return new SeqJoinSeqBond<A,B> (this.copy as Sequence<A>, bond.copy as SeqBond<A,B>);
@@ -91,7 +111,7 @@ namespace Atoms
 
 		public static Sequence<A> operator * (int n, Sequence<A> seq) 
 		{
-			return seq.CycleN (n);
+			return seq.Replicate (n);
 		}
 		
 		public static Sequence<A> operator * (Sequence<A> seq, int n) 
@@ -120,6 +140,11 @@ namespace Atoms
 		public new Functor<A> XMap (Func<Exception, Exception> f)
 		{
 			throw new NotImplementedException ();
+		}
+
+		internal override IEnumerable GetEnumerable ()
+		{
+			return GetEnumerator ().ToEnumerable ();
 		}
 
 		public new abstract IEnumerator<A> GetEnumerator ();

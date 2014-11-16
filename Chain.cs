@@ -39,7 +39,7 @@ namespace Atoms
 
 		Functor<A> Applicative<A>.Pure (A value)
 		{
-			return Do._ (() => value);
+			return Atoms.Do._ (() => value);
 		}
 
 		Functor<B> Functor<A>.FMap<B> (Func<A, B> f)
@@ -79,12 +79,12 @@ namespace Atoms
 
 		public static Chain<A> operator + (Atom a, Chain<A> b)
 		{
-			return a.Bind (b);
+			return a.Then (b);
 		}
 
 		public static Chain<A> operator * (int n, Chain<A> chain) 
 		{
-			return chain.Replicate (n).FoldL1 ((sum, next) => sum + next);
+			return chain.Replicate (n);
 		}
 		
 		public static Chain<A> operator * (Chain<A> chain, int n) 

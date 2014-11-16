@@ -225,6 +225,44 @@ namespace Atoms
 		}
 	}
 
+	public class SeqJoinSeqBondChain<A,B> : Chain<B> 
+	{
+		public Sequence<A> a;
+		public SeqBondChain<A,B> b;
+		
+		public SeqJoinSeqBondChain (Sequence<A> a, SeqBondChain<A,B> b)
+		{
+			b.prev = a;
+			
+			this.a = a;
+			this.b = b;
+		}
+		
+		internal override IEnumerable GetEnumerable ()
+		{
+			return b;
+		}
+	}
+
+	public class SeqJoinSeqBondAtom<A> : Atom
+	{
+		public Sequence<A> a;
+		public SeqBondAtom<A> b;
+		
+		public SeqJoinSeqBondAtom (Sequence<A> a, SeqBondAtom<A> b)
+		{
+			b.prev = a;
+			
+			this.a = a;
+			this.b = b;
+		}
+		
+		internal override IEnumerable GetEnumerable ()
+		{
+			return b;
+		}
+	}
+
 	//Parallels
 	public class AtomParallelAtom : Atom
 	{

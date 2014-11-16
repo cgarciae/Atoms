@@ -41,6 +41,22 @@ namespace Atoms {
 			yield return f ((A) enu.Current);
 		}
 
+		//Atomize
+		public static Atom Atomize (this IEnumerable e)
+		{
+			return new Atoms.Atomize (e);
+		}
+
+		public static Chain<A> Atomize<A> (this IEnumerable e)
+		{
+			return new Atoms.Atomize<A> (e);
+		}
+
+		public static Sequence<A> Atomize<A> (this IEnumerable<A> e)
+		{
+			return new Atoms.AtomizeSeq<A> (e);
+		}
+
 	}
 
 	public interface IBound {
@@ -49,9 +65,25 @@ namespace Atoms {
 
 	public abstract partial class Sequence<A> 
 	{
-		public Sequence<A> CycleN (int n)
+		public Sequence<A> Replicate (int n)
 		{
-			return this.Replicate (n).FoldL1 ((sum, next) => sum.Then (next));
+			return Fn.Replicate (this, n).FoldL1 ((sum, next) => sum.Then (next));
+		}
+	}
+
+	public abstract partial class Chain<A> 
+	{
+		public Chain<A> Replicate (int n)
+		{
+			return Fn.Replicate (this, n).FoldL1<Chain<A>> ((sum, next) => sum.Then (next));
+		}
+	}
+
+	public abstract partial class Atom
+	{
+		public Atom Replicate (int n)
+		{
+			return Fn.Replicate (this, n).FoldL1<Atom> ((sum, next) => sum + next);
 		}
 	}
 }

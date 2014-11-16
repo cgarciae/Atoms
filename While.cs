@@ -31,4 +31,12 @@ namespace Atoms
 			return new While (Cond);
 		}
 	}
+
+	public abstract partial class Atom
+	{
+		public Atom While (Func<bool> cond)
+		{
+			return this.BoundedBy (Atoms.While._(cond));
+		}
+	}
 }

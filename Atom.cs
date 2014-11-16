@@ -23,7 +23,7 @@ namespace Atoms {
 			return Then (LazyAtom._ (f));
 		}
 
-		public Chain<A> Bind<A> (Chain<A> chain)
+		public Chain<A> Then<A> (Chain<A> chain)
 		{
 			return new AtomJoinChain<A> (this.copy as Atom, chain.copy as Chain<A>);
 		}
@@ -33,9 +33,9 @@ namespace Atoms {
 			return new AtomJoinBoundChain<A> (this.copy as Atom, chain.copy as BoundedChain<A>);
 		}
 
-		public Chain<A> Bind<A> (Func<Chain<A>> f)
+		public Chain<A> Then<A> (Func<Chain<A>> f)
 		{
-			return Bind (Atoms.LazyAtom._ (f));
+			return Then (LazyAtom._ (f));
 		}
 
 		public Atom Par (Atom other) 
@@ -59,7 +59,7 @@ namespace Atoms {
 
 		public static Atom operator * (int n, Atom atom) 
 		{
-			return atom.Replicate (n).FoldL1 ((sum, next) => sum + next);
+			return atom.Replicate (n);
 		}
 
 		public static Atom operator * (Atom atom, int n) 

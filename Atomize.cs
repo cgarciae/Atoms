@@ -1,35 +1,50 @@
-//using System;
-//using System.Collections;
-//
-//namespace Atoms {
-//	public class Atomize<B> : Chain<B>, IChain<B> {
-//
-//		IEnumerable enu;
-//
-//		internal Atomize (IEnumerable enu, Quantum prev, Quantum next) : base (prev, next) {
-//			this.enu = enu;
-//		}
-//
-//		public Atomize (IChain<B> chain, Quantum prev) : base (prev, null)
-//		{
-//			this.enu = chain;
-//		}
-//
-//		public Atomize (IChain<B> chain, Quantum prev, Quantum next) : base (prev, next)
-//		{
-//			this.enu = chain;
-//		}
-//
-//		internal override IEnumerable GetEnumerable ()
-//		{
-//			return enu;
-//		}
-//
-//		public override Chain<B> copyChain {
-//			get {
-//				return new Atomize<B> (enu, prev, next);
-//			}
-//		}
-//
-//	}
-//}
+using System;
+using System.Collections;
+using System.Collections.Generic;
+
+namespace Atoms {
+	public class Atomize : Atom {
+
+		public IEnumerable e;
+
+		public Atomize (IEnumerable e)
+		{
+			this.e = e;
+		}
+		
+		internal override IEnumerable GetEnumerable ()
+		{
+			return e;
+		}
+	}
+
+	public class Atomize<A> : Chain<A> 
+	{	
+		public IEnumerable e;
+		
+		public Atomize (IEnumerable e)
+		{
+			this.e = e;
+		}
+		
+		internal override IEnumerable GetEnumerable ()
+		{
+			return e;
+		}
+	}
+
+	public class AtomizeSeq<A> : Sequence<A> 
+	{	
+		public IEnumerable<A> e;
+		
+		public AtomizeSeq (IEnumerable<A> e)
+		{
+			this.e = e;
+		}
+		
+		public override IEnumerator<A> GetEnumerator ()
+		{
+			return e.GetEnumerator ();
+		}
+	}
+}

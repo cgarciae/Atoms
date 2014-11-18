@@ -4,6 +4,14 @@ using System.Collections.Generic;
 
 namespace Atoms
 {
+	public abstract class Bond<A> : BoundQuantum
+	{
+		public static Atom operator * (Chain<A> chain, Bond<A> bond)
+		{
+			return chain.Bind (bond);
+		}
+	}
+
 	public abstract class Bond<A,B> : BoundQuantum
 	{
 		public static Chain<B> operator * (Chain<A> chain, Bond<A,B> bond) {
@@ -14,14 +22,14 @@ namespace Atoms
 	public abstract class SeqBondChain<A,B> : BoundQuantum
 	{
 		public static Chain<B> operator * (Sequence<A> seq, SeqBondChain<A,B> bond) {
-			return seq.BindEach (bond);
+			return seq.SBind (bond);
 		}
 	}
 
 	public abstract class SeqBondAtom<A> : BoundQuantum
 	{
 		public static Atom operator * (Sequence<A> seq, SeqBondAtom<A> bond) {
-			return seq.BindEach (bond);
+			return seq.SBind (bond);
 		}
 	}
 
@@ -35,7 +43,7 @@ namespace Atoms
 		}
 
 		public static Sequence<B> operator * (Sequence<A> seq, SeqBond<A,B> bond) {
-			return seq.Bind (bond);
+			return seq.Then (bond);
 		}
 	}
 }

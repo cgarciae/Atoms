@@ -7,6 +7,16 @@ namespace Atoms
 {
 	public abstract partial class Chain<A> : Atom, Monad<A>
 	{
+		public Atom Bind (Func<A, Atom> f)
+		{
+			return new ChainJoinBond<A> (this.copy as Chain<A>, new Bind<A> (f));	
+		}
+
+		public Atom Bind (Bond<A> bond)
+		{
+			return new ChainJoinBond<A> (this.copy as Chain<A>, bond);	
+		}
+
 		public Chain<B> Bind<B> (Func<A,Chain<B>> f)
 		{
 			return new ChainJoinBond<A,B> (this.copy as Chain<A>, new Bind<A,B> (f));
@@ -22,12 +32,12 @@ namespace Atoms
 			return this.Bind ((Bond<A,B>)bind);	
 		}
 
-		public Chain<B> Bind<B> (Map<A,B> map)
+		public Chain<B> Map<B> (Map<A,B> map)
 		{
-			return this.Bind ((Bond<A,B>)map);	
+			return this.Bind (map);	
 		}
 
-		public Chain<B> FMap<B> (Func<A, B> f)
+		public Chain<B> Map<B> (Func<A, B> f)
 		{
 			return new ChainJoinBond<A,B> (this, Map<A,B>._ (f));
 		}
@@ -44,7 +54,7 @@ namespace Atoms
 
 		Functor<B> Functor<A>.FMap<B> (Func<A, B> f)
 		{
-			return FMap (f);
+			return Map (f);
 		}
 
 		Functor<A> Functor<A>.XMap (Func<Exception, Exception> f)

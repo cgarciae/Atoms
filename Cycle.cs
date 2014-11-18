@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Tatacoa;
@@ -49,7 +49,7 @@ namespace Atoms
 	{
 		public Atom Cycle ()
 		{
-			return this.BoundedBy (Atoms.Cycle._ ());
+			return this.Then (Atoms.Cycle._ ());
 		}
 	}
 
@@ -57,7 +57,7 @@ namespace Atoms
 	{
 		public Atom Cycle ()
 		{
-			return this.BoundedBy (Atoms.Cycle._<A> ());
+			return this.Then (Atoms.Cycle._<A> ());
 		}
 	}
 	

@@ -7,49 +7,59 @@ namespace Atoms
 {
 	public abstract partial class Sequence<A> : Chain<A>, Monad<A>, IEnumerable<A>
 	{
-		public Sequence<B> FMap<B> (Func<A,B> f)
+		public Sequence<B> SMap<B> (Func<A,B> f)
 		{
 			return new SeqJoinSeqBond<A,B> (this, SeqMap<A,B>._ (f));
 		}
 
-		public Sequence<B> Bind<B> (Func<A,Sequence<B>> f)
+		public Sequence<B> SBind<B> (Func<A,Sequence<B>> f)
 		{
 			return new SeqJoinSeqBond<A,B> (this, SeqBind<A,B>._ (f));
 		}
 
-		public Chain<B> BindEach<B> (Func<A,Chain<B>> f)
+		public Chain<B> SBind<B> (Func<A,Chain<B>> f)
 		{
 			return new SeqJoinSeqBondChain<A,B> (this, BindEach<A,B>._ (f));
 		}
 
-		public Chain<B> BindEach<B> (SeqBondChain<A,B> bond)
+		public Chain<B> SBind<B> (SeqBondChain<A,B> bond)
 		{
 			return new SeqJoinSeqBondChain<A,B> (this, bond.copy as SeqBondChain<A,B>);
 		}
 
-		public Atom BindEach (Func<A,Atom> f)
+		public Atom SBind (Func<A,Atom> f)
 		{
 			return new SeqJoinSeqBondAtom<A> (this, Atoms.BindEach<A>._ (f));
 		}
 		
-		public Atom BindEach (SeqBondAtom<A> bond)
+		public Atom SBind (SeqBondAtom<A> bond)
 		{
 			return new SeqJoinSeqBondAtom<A> (this, bond.copy as SeqBondAtom<A>);
 		}
 
-		public Sequence<B> Bind<B> (SeqBond<A,B> bond)
+		public Sequence<B> Then<B> (SeqBond<A,B> bond)
 		{
 			return new SeqJoinSeqBond<A,B> (this.copy as Sequence<A>, bond.copy as SeqBond<A,B>);
 		}
 
-		public Sequence<A> Then<A> (Func<Sequence<A>> f)
+		public Sequence<A> Then (Func<Sequence<A>> f)
 		{
 			return Then (LazySeq<A>._ (f));
 		}
 
-		public new Monad<B> Bind<B> (Func<A, Monad<B>> f)
+		Monad<B> Monad<A>.Bind<B> (Func<A, Monad<B>> f)
 		{
 			throw new NotImplementedException ();
+		}
+
+		public Sequence<A> Then (Sequence<A> seq)
+		{
+			return new SeqJoinSeq<A> (this.copy as Sequence<A>, seq.copy as Sequence<A>);
+		}
+		
+		public Sequence<A> Then (BoundedSequence<A> boundedSeq)
+		{
+			return new SeqJoinBoundSeq<A> (this.copy as Sequence<A>, boundedSeq.copy as BoundedSequence<A>);
 		}
 
 		public new Functor<A> Pure (A value)
@@ -89,15 +99,7 @@ namespace Atoms
 			return GetEnumerator ().ToEnumerable ();
 		}
 
-		public Sequence<A> Then (Sequence<A> seq)
-		{
-			return new SeqJoinSeq<A> (this.copy as Sequence<A>, seq.copy as Sequence<A>);
-		}
 
-		public Sequence<A> BoundBy (BoundedSequence<A> boundedSeq)
-		{
-			return new SeqJoinBoundSeq<A> (this.copy as Sequence<A>, boundedSeq.copy as BoundedSequence<A>);
-		}
 
 		public static Sequence<A> operator + (Sequence<A> a, Sequence<A> b)
 		{
@@ -106,7 +108,7 @@ namespace Atoms
 
 		public static Sequence<A> operator + (Sequence<A> a, BoundedSequence<A> b)
 		{
-			return a.BoundBy (b);
+			return a.Then (b);
 		}
 
 		public static Sequence<A> operator * (int n, Sequence<A> seq) 
@@ -122,7 +124,7 @@ namespace Atoms
 
 	public abstract class BoundedSequence<A> : BoundedChain<A>, Monad<A>, IEnumerable<A>
 	{
-		public new Monad<B> Bind<B> (Func<A, Monad<B>> f)
+		public new Monad<B> Then<B> (Func<A, Monad<B>> f)
 		{
 			throw new NotImplementedException ();
 		}
@@ -132,7 +134,7 @@ namespace Atoms
 			throw new NotImplementedException ();
 		}
 		
-		public new Functor<B> FMap<B> (Func<A, B> f)
+		public new Functor<B> Then<B> (Func<A, B> f)
 		{
 			throw new NotImplementedException ();
 		}

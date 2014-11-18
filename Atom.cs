@@ -6,14 +6,14 @@ using Tatacoa;
 namespace Atoms {
 	public abstract partial class Atom : Quantum {
 
-		public static Atom DoNothing = new Do (() => {});
+
 
 		public Atom Then (Atom atom)
 		{
 			return new AtomJoinAtom (this.copy as Atom, atom.copy as Atom);
 		}
 
-		public Atom BoundedBy (BoundedAtom boundAtom)
+		public Atom Then (BoundedAtom boundAtom)
 		{
 			return new AtomJoinBoundAtom (this.copy as Atom, boundAtom.copy as BoundedAtom);
 		}
@@ -28,7 +28,7 @@ namespace Atoms {
 			return new AtomJoinChain<A> (this.copy as Atom, chain.copy as Chain<A>);
 		}
 
-		public Chain<A> BoundedBy<A> (BoundedChain<A> chain)
+		public Chain<A> Then<A> (BoundedChain<A> chain)
 		{
 			return new AtomJoinBoundChain<A> (this.copy as Atom, chain.copy as BoundedChain<A>);
 		}
@@ -54,7 +54,7 @@ namespace Atoms {
 		}
 		public static Atom operator + (Atom a, BoundedAtom b)
 		{
-			return a.BoundedBy (b);
+			return a.Then (b);
 		}
 
 		public static Atom operator * (int n, Atom atom) 
@@ -71,18 +71,26 @@ namespace Atoms {
 		{
 			return a.Par (b);
 		}
+
+		public static Atom DoNothing = new Do (() => {});
+		public static Atom NullAtom = new Atomize (Null());
+
+		static IEnumerable Null ()
+		{
+			yield break;	
+		}
 	}
 
 	public abstract class BoundedAtom : BoundQuantum
 	{
-		public BoundedAtom BoundBy (BoundedAtom boundedAtom)
+		public BoundedAtom Then (BoundedAtom boundedAtom)
 		{
 			return new BoundedAtomJoinBoundedAtom (this.copy as BoundedAtom, boundedAtom.copy as BoundedAtom);
 		}
 
 		public static BoundedAtom operator + (BoundedAtom a, BoundedAtom b)
 		{
-			return a.BoundBy (b);
+			return a.Then (b);
 		}
 	}
 }

@@ -42,4 +42,14 @@ namespace Atoms
 			this.Cond = Cond;
 		}
 	}
+
+	public abstract class BoundedSeqConditional<A> : BoundedSequence<A> 
+	{
+		public Func<bool> Cond;
+		
+		internal BoundedSeqConditional (Func<bool> Cond)
+		{
+			this.Cond = Cond;
+		}
+	}
 }

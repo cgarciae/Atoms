@@ -6,6 +6,34 @@ using Tatacoa;
 
 namespace Atoms {
 
+	public class Bind<A> : Bond<A>
+	{
+		public Func<A, Atom> f;
+
+		public Bind (Func<A, Atom> f)
+		{
+			this.f = f;
+		}
+
+		internal override IEnumerable GetEnumerable ()
+		{
+			var enu = prev.GetEnumerator ();
+			while (enu.MoveNext()) 
+				yield return enu.Current;
+			
+			
+			var a = (A) enu.Current;
+			
+			var atom = f (a);
+			
+			if (atom == null)
+				throw new NullReferenceException ("Function returned null atom");
+			
+			foreach (var _ in (Atom) atom.copy) 
+				yield return _;
+		}
+	}
+
 	public class Bind<A,B> : Bond<A,B>
 	{	
 		public Func<A,Chain<B>> f;
@@ -33,14 +61,7 @@ namespace Atoms {
 			
 			foreach (var _ in chain) yield return _;
 		}
-		
-		public override IEnumerable<Quantum> GetQuanta ()
-		{
-			if (chain != null)
-				return chain.GetQuanta ().Join (Fn.AppendL (this, prev.GetQuanta ()));
-			else
-				return Fn.AppendL (this, prev.GetQuanta ());
-		}
+
 	}
 
 	public class BindEach<A,B> : SeqBondChain<A,B>

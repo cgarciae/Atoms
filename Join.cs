@@ -155,6 +155,26 @@ namespace Atoms
 		}
 	}
 
+	public class ChainJoinBond<A> : Atom
+	{
+		public Chain<A> a;
+		public Bond<A> b;
+
+		public ChainJoinBond (Chain<A> a, Bond<A> b)
+		{
+			b.prev = a;
+
+			this.a = a;
+			this.b = b;
+		}
+
+		internal override IEnumerable GetEnumerable ()
+		{
+			return b;
+		}
+
+	}
+
 	public class SeqJoinSeq<A> : Sequence<A> 
 	{
 		public Sequence<A> a;

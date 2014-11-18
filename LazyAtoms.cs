@@ -81,6 +81,11 @@ namespace Atoms
 			
 			yield return this;
 		}
+
+		public static LazyChain<A> _ (Func<Chain<A>> f)
+		{
+			return new LazyChain<A> (f);
+		}
 	}
 	
 	public class LazySeq<A> : Sequence<A>

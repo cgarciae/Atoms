@@ -35,7 +35,14 @@ namespace Atoms
 				if (! move)
 				{
 					_state = actual.onFinish();
-					actual = map [_state];
+					nextBehaviour = map [_state];
+
+					Debug.Log (_state);
+
+					actual.onExit.Broadcast();
+					nextBehaviour.onEnter.Broadcast();
+					
+					actual = nextBehaviour;
 					enu = actual.enumerator;
 
 					continue;
@@ -46,8 +53,10 @@ namespace Atoms
 				_state = actual.transitionFunction (_state);
 				nextBehaviour = map [_state];
 
+
 				if (nextBehaviour != actual)
 				{
+					Debug.Log (_state);
 					actual.onExit.Broadcast();
 					nextBehaviour.onEnter.Broadcast();
 

@@ -77,12 +77,12 @@ namespace Atoms
 			return new Bind<A, B> (f);	
 		}
 
-		public AtomParallelChain<A> Par (Atom other) 
+		public AtomParallelChain<A> InParrallel (Atom other) 
 		{
 			return AtomParallelChain<A>._ (other, this);
 		}
 
-		public ChainParallelChain<A,B> Par<B> (Chain<B> other) 
+		public ChainParallelChain<A,B> InParrallel<B> (Chain<B> other) 
 		{
 			return ChainParallelChain<A,B>._ (this, other);
 		}

@@ -47,4 +47,12 @@ namespace Atoms {
 		}
 	}
 
+
+	public static class WaitWhile {
+
+		public static Atom _ (Func<bool> cond)
+		{
+			return Wait._ ().While (cond);
+		}
+	}
 }

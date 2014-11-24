@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Tatacoa;
@@ -38,12 +38,12 @@ namespace Atoms {
 			return Then (LazyAtom._ (f));
 		}
 
-		public Atom Par (Atom other) 
+		public Atom Parallel (Atom other) 
 		{
 			return AtomParallelAtom._ (this, other);	
 		}
 
-		public Chain<A> Par<A> (Chain<A> other) 
+		public Chain<A> Parallel<A> (Chain<A> other) 
 		{
 			return AtomParallelChain<A>._ (this, other);	
 		}
@@ -69,7 +69,7 @@ namespace Atoms {
 
 		public static Atom operator | (Atom a, Atom b)
 		{
-			return a.Par (b);
+			return a.Parallel (b);
 		}
 
 		public static Atom DoNothing = new Do (() => {});

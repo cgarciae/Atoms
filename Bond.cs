@@ -22,14 +22,14 @@ namespace Atoms
 	public abstract class SeqBondChain<A,B> : BoundQuantum
 	{
 		public static Chain<B> operator * (Sequence<A> seq, SeqBondChain<A,B> bond) {
-			return seq.SBind (bond);
+			return seq.BindEach (bond);
 		}
 	}
 
 	public abstract class SeqBondAtom<A> : BoundQuantum
 	{
 		public static Atom operator * (Sequence<A> seq, SeqBondAtom<A> bond) {
-			return seq.SBind (bond);
+			return seq.BindEach (bond);
 		}
 	}
 

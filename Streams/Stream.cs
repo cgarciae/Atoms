@@ -266,17 +266,20 @@ namespace Streams {
 			return s.RemoveDataHandler (f);
 		}
 
-		public Chain<A> First ()
-		{
-			A a = default (A);
-			bool broadcasted = false;
+		public Chain<A> First {
+			get {
+				A a = default (A);
+				bool broadcasted = false;
 
-			OnData ((val) => {
-				broadcasted = true;
-				a = val;
-			});
+				OnData ((val) => {
+					broadcasted = true;
+					a = val;
+				});
 
-			return KeepDoing._ (() => a).While (() => ! broadcasted);
+				return Wait._ ()
+					.While (() => ! broadcasted)
+					.Do (() => a);
+			}
 		}
 	}
 

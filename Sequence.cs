@@ -7,32 +7,32 @@ namespace Atoms
 {
 	public abstract partial class Sequence<A> : Chain<A>, Monad<A>, IEnumerable<A>
 	{
-		public Sequence<B> SMap<B> (Func<A,B> f)
+		public Sequence<B> MapEach<B> (Func<A,B> f)
 		{
 			return new SeqJoinSeqBond<A,B> (this, SeqMap<A,B>._ (f));
 		}
 
-		public Sequence<B> SBind<B> (Func<A,Sequence<B>> f)
+		public Sequence<B> BindEach<B> (Func<A,Sequence<B>> f)
 		{
 			return new SeqJoinSeqBond<A,B> (this, SeqBind<A,B>._ (f));
 		}
 
-		public Chain<B> SBind<B> (Func<A,Chain<B>> f)
+		public Chain<B> BindEach<B> (Func<A,Chain<B>> f)
 		{
 			return new SeqJoinSeqBondChain<A,B> (this, BindEach<A,B>._ (f));
 		}
 
-		public Chain<B> SBind<B> (SeqBondChain<A,B> bond)
+		public Chain<B> BindEach<B> (SeqBondChain<A,B> bond)
 		{
 			return new SeqJoinSeqBondChain<A,B> (this, bond.copy as SeqBondChain<A,B>);
 		}
 
-		public Atom SBind (Func<A,Atom> f)
+		public Atom BindEach (Func<A,Atom> f)
 		{
 			return new SeqJoinSeqBondAtom<A> (this, Atoms.BindEach<A>._ (f));
 		}
 		
-		public Atom SBind (SeqBondAtom<A> bond)
+		public Atom BindEach (SeqBondAtom<A> bond)
 		{
 			return new SeqJoinSeqBondAtom<A> (this, bond.copy as SeqBondAtom<A>);
 		}

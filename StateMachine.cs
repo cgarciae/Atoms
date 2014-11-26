@@ -24,11 +24,20 @@ namespace Atoms
 		internal override IEnumerable GetEnumerable ()
 		{
 			StateBehaviour<A> actual = map [initialState];
-			StateBehaviour<A> nextBehaviour;
+			StateBehaviour<A> nextBehaviour = null;
 			IEnumerator enu = actual.enumerator;
 			bool move;
 
 			actual.onEnter.Broadcast ();
+			Action changeState = () => {
+				Debug.Log (_state);
+				
+				actual.onExit.Broadcast();
+				nextBehaviour.onEnter.Broadcast();
+				
+				actual = nextBehaviour;
+				enu = actual.enumerator;
+			};
 
 			while ((move = enu.MoveNext()) || actual.transitive) 
 			{
@@ -37,13 +46,7 @@ namespace Atoms
 					_state = actual.onFinish();
 					nextBehaviour = map [_state];
 
-					Debug.Log (_state);
-
-					actual.onExit.Broadcast();
-					nextBehaviour.onEnter.Broadcast();
-					
-					actual = nextBehaviour;
-					enu = actual.enumerator;
+					changeState();
 
 					continue;
 				}
@@ -56,12 +59,7 @@ namespace Atoms
 
 				if (nextBehaviour != actual)
 				{
-					Debug.Log (_state);
-					actual.onExit.Broadcast();
-					nextBehaviour.onEnter.Broadcast();
-
-					actual = nextBehaviour;
-					enu = actual.enumerator;
+					changeState();
 				}
 			}
 		}

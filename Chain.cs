@@ -42,6 +42,11 @@ namespace Atoms
 			return new ChainJoinBond<A,B> (this, Map<A,B>._ (f));
 		}
 
+		public Chain<A> Map (Action<A> f)
+		{
+			return Map (f.ToFunc ());
+		}
+
 		Monad<B> Monad<A>.Bind<B> (Func<A, Monad<B>> f)
 		{
 			return Bind (f as Func<A,Chain<B>>);

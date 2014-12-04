@@ -167,4 +167,12 @@ namespace Atoms
 			foreach (var q in prev.GetQuanta()) yield return q;
 		}
 	}
+
+	public abstract partial class Atom
+	{
+		public Atom CatchError<E> (Action<E> f) where E : Exception
+		{
+			return this.Then (Atoms.CatchError<E>._ (f));
+		}
+	}
 }

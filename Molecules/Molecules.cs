@@ -84,4 +84,32 @@ namespace Atoms {
 					.Do (() => www);
 		}
 	}
+
+	//ScreenShot
+	public static class ScreenShot
+	{
+		public static Chain<UnityEngine.Texture2D> _ ()
+		{
+			return 
+				Do._ (() => new UnityEngine.WaitForEndOfFrame ())
+				.Do (() => 
+			    {
+					var width = UnityEngine.Screen.width;
+					var height = UnityEngine.Screen.height;
+					var tex = new UnityEngine.Texture2D(width, height, UnityEngine.TextureFormat.RGB24, false);
+					// Read screen contents into the texture
+					tex.ReadPixels(new UnityEngine.Rect(0, 0, width, height), 0, 0);
+					tex.Apply();
+					return tex;
+				});
+		}
+	}
+
+	public abstract partial class Atom
+	{
+		public Chain<UnityEngine.Texture2D> ScreenShot ()
+		{
+			return this.Then (Atoms.ScreenShot._ ());
+		}
+	}
 }

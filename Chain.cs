@@ -82,6 +82,26 @@ namespace Atoms
 			return new Bind<A, B> (f);	
 		}
 
+		public Chain<B> Then<B> (Func<A,B> f)
+		{
+			return Map (f);
+		}
+
+		public Chain<A> Then (Action<A> f)
+		{
+			return Map (f);
+		}
+
+		public Chain<A> Then (Action f)
+		{
+			return Map (f.ToFunc<A>());
+		}
+
+		public Chain<B> Then<B> (Func<A,Chain<B>> f)
+		{
+			return Bind (f);
+		}
+
 		public AtomParallelChain<A> Parallel (Atom other) 
 		{
 			return AtomParallelChain<A>._ (other, this);

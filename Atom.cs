@@ -38,6 +38,16 @@ namespace Atoms {
 			return Then (LazyAtom._ (f));
 		}
 
+		public Atom Then (Action f)
+		{
+			return Then(new Do (f));
+		}
+
+		public Chain<A> Then<A> (Func<A> f)
+		{
+			return Then(new Do<A> (f));
+		}
+
 		public Atom Parallel (Atom other) 
 		{
 			return AtomParallelAtom._ (this, other);	

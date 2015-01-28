@@ -2,10 +2,13 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using Tatacoa;
 
 namespace Atoms {
 	public static partial class At {
+
+		public static string URLPattern = @"([a-zA-Z]{4,})://([\w-]+\.)+[\w-]+(/[\w- ./?%&=]*)?";
 
 		//Start
 		public static Coroutine Start (this IEnumerable e, MonoBehaviour m) 
@@ -55,6 +58,59 @@ namespace Atoms {
 		public static Sequence<A> Atomize<A> (this IEnumerable<A> e)
 		{
 			return new Atoms.AtomizeSeq<A> (e);
+		}
+
+		public static bool IsURL (string s)
+		{
+			return  Regex.IsMatch (s, URLPattern);
+		}
+
+		public static Chain<C> Load<A,B,C> (WWW www, Func<WWW,A> beforeFun, Func<A,B> yieldFun, Func<B,C> afterFun, float percent = 1f, Action<float> onProgress = null) where C : UnityEngine.Object {
+			
+			return IsURL (www.url) ?
+				LoadWeb (www, beforeFun, yieldFun, afterFun, percent, onProgress) :
+				new LoadLocal<C> (www.url, onProgress);
+		}
+
+		public static Chain<B> Load<A,B> (WWW www, Func<WWW,A> beforeFun, Func<A,B> yieldFun, float percent = 1f, Action<float> onProgress = null) where B : UnityEngine.Object
+		{
+			return Load (www, beforeFun, yieldFun, Fn.Id<B> (), percent, onProgress);
+		}
+
+		public static Chain<A> Load<A> (WWW www, Func<WWW,A> beforeFun, float percent = 1f, Action<float> onProgress = null) where A : UnityEngine.Object
+		{
+			return Load (www, beforeFun, Fn.Id<A> (), percent, onProgress);
+		}
+
+		public static Chain<WWW> Load<A> (WWW www, Action<WWW> beforeFun, float percent = 1f, Action<float> onProgress = null) where A : UnityEngine.Object
+		{
+			Func<WWW,A> f = (WWW _www) =>
+			{
+				beforeFun (_www);
+				return default (A);
+			};
+
+			return At.Load (www, f, percent, onProgress)
+				.Then<WWW> (() => www);
+		}
+
+		public static Chain<C> LoadWeb<A,B,C> (WWW www, Func<WWW,A> f, Func<A,B> g, Func<B,C> h, float percent = 1f, Action<float> onProgress = null)
+		{
+			Debug.Log ("LOAD WEB");
+			return new LoadWWW (www, percent, onProgress)
+				.Map (f)
+				.Map (g)
+				.Map (h)
+				.Then (DisposeWWW (www));
+		}
+
+		public static Action DisposeWWW (WWW www) {
+			return () => {
+				if (www.assetBundle)
+					www.assetBundle.Unload (false);
+				www.Dispose ();
+				www = null;
+			};
 		}
 
 	}

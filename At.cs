@@ -94,6 +94,16 @@ namespace Atoms {
 				.Then<WWW> (() => www);
 		}
 
+		public static Chain<A> LoadWeb<A> (WWW www, Func<WWW,A> f, float percent = 1f, Action<float> onProgress = null)
+		{
+			return LoadWeb (www, f, Fn.Id<A> (), percent, onProgress);
+		}
+
+		public static Chain<B> LoadWeb<A,B> (WWW www, Func<WWW,A> f, Func<A,B> g, float percent = 1f, Action<float> onProgress = null)
+		{
+			return LoadWeb (www, f, g, Fn.Id<B> (), percent, onProgress);
+		}
+
 		public static Chain<C> LoadWeb<A,B,C> (WWW www, Func<WWW,A> f, Func<A,B> g, Func<B,C> h, float percent = 1f, Action<float> onProgress = null)
 		{
 			Debug.Log ("LOAD WEB");
@@ -111,6 +121,41 @@ namespace Atoms {
 				www.Dispose ();
 				www = null;
 			};
+		}
+
+		public static Chain<GameObject> RequestGameObject (String url, int version, Action<float> onProgress = null)
+		{
+			return LoadWeb
+			(
+				WWW.LoadFromCacheOrDownload (url, version),
+				(WWW www) => www.assetBundle,
+				assetBundle => assetBundle.LoadAsync (Help.GetAssetName (url), typeof(GameObject)),
+				request => (GameObject)request.asset,
+				1f,
+				onProgress
+			);
+		}
+
+		public static Chain<String> RequestString (String url, float percent = 1f, Action<float> onProgress = null)
+		{
+			return LoadWeb
+			(
+				new WWW (url),
+				(WWW www) => www.text,
+				percent,
+				onProgress
+			);
+		}
+
+		public static Chain<A> RequestDecoded<A> (String url, float percent = 1f, Action<float> onProgress = null)
+		{
+			return RequestString
+			(
+				url,
+				percent,
+				onProgress
+			)
+			.Then ((String s) => Help.Deserialize<A> (s));
 		}
 
 	}

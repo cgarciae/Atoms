@@ -30,7 +30,7 @@ namespace Atoms
 
 			actual.onEnter.Broadcast ();
 			Action changeState = () => {
-				Debug.Log (_state);
+				//Debug.Log (_state);
 				
 				actual.onExit.Broadcast();
 				nextBehaviour.onEnter.Broadcast();

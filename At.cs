@@ -40,8 +40,10 @@ namespace Atoms {
 			
 			while (enu.MoveNext())
 				yield return enu.Current;
-			
-			yield return f ((A) enu.Current);
+
+			A a = (A)enu.Current;
+
+			yield return f (a);
 		}
 
 		//Atomize
@@ -108,11 +110,17 @@ namespace Atoms {
 		{
 			Debug.Log ("LOAD WEB");
 			return new LoadWWW (www, percent, onProgress)
-				.Map (f)
-				.Map (g)
-				.Map (h)
-				.Then (DisposeWWW (www));
+				.Then (f)
+				.Then (g)
+				.Then (h)
+				.Then (DisposeWWW (www))
+				.Then ((C c) => {
+					if (c == null)
+						throw new Exception ("WEB LOAD FAILED");
+				});
 		}
+
+
 
 		public static Action DisposeWWW (WWW www) {
 			return () => {
@@ -123,14 +131,25 @@ namespace Atoms {
 			};
 		}
 
-		public static Chain<GameObject> RequestGameObject (String url, int version, Action<float> onProgress = null)
+		public static Chain<GameObject> RequestGameObject (String url, int version, string name, Action<float> onProgress = null)
 		{
 			return LoadWeb
 			(
 				WWW.LoadFromCacheOrDownload (url, version),
 				(WWW www) => www.assetBundle,
-				assetBundle => assetBundle.LoadAsync (Help.GetAssetName (url), typeof(GameObject)),
+				assetBundle => assetBundle.LoadAsync (name, typeof(GameObject)),
 				request => (GameObject)request.asset,
+				1f,
+				onProgress
+			);
+		}
+
+		public static Chain<Texture2D> RequestImage (String url, Action<float> onProgress = null)
+		{
+			return LoadWeb
+			(
+				new WWW (url),
+				(WWW www) => www.texture,
 				1f,
 				onProgress
 			);

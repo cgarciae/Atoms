@@ -137,7 +137,7 @@ namespace Atoms {
 			(
 				WWW.LoadFromCacheOrDownload (url, version),
 				(WWW www) => www.assetBundle,
-				assetBundle => assetBundle.LoadAsync (name, typeof(GameObject)),
+				assetBundle => assetBundle.LoadAssetAsync (name, typeof(GameObject)),
 				request => (GameObject)request.asset,
 				1f,
 				onProgress

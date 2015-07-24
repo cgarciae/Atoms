@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using Tatacoa;
 
 namespace Atoms {
@@ -71,7 +72,7 @@ namespace Atoms {
 	{
 		public static Chain<UnityEngine.WWW> _ (string url, string json)
 		{
-			Hashtable headers = new Hashtable ();
+			var headers = new Dictionary<String,String> ();
 			headers.Add ("Content-Type", "application/json");
 			headers.Add ("Cookie", "Our session cookie");
 			
